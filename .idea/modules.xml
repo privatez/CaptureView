@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/OneHash.iml" filepath="$PROJECT_DIR$/OneHash.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android-library-scan/android-library-scan.iml" filepath="$PROJECT_DIR$/android-library-scan/android-library-scan.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android-library-utils/android-library-utils.iml" filepath="$PROJECT_DIR$/android-library-utils/android-library-utils.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+    </modules>
+  </component>
+</project>
