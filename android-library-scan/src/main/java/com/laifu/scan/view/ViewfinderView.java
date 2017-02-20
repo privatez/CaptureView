@@ -34,6 +34,8 @@ import com.laifu.scan.camera.CameraManager;
 import java.util.Collection;
 import java.util.HashSet;
 
+import static com.onehash.utils.CustomUtils.getTextWidth;
+
 /**
  * This view is overlaid on top of the camera preview. It adds the viewfinder
  * rectangle and partial transparency outside it, as well as the laser scanner
@@ -235,32 +237,8 @@ public final class ViewfinderView extends View {
         }
     }
 
-    private int getTextWidth(Paint paint, String str) {
-        int iRet = 0;
-        if (str != null && str.length() > 0) {
-            int len = str.length();
-            float[] widths = new float[len];
-            paint.getTextWidths(str, widths);
-            for (int j = 0; j < len; j++) {
-                iRet += (int) Math.ceil(widths[j]);
-            }
-        }
-        return iRet;
-    }
-
     public void drawViewfinder() {
         resultBitmap = null;
-        invalidate();
-    }
-
-    /**
-     * Draw a bitmap with the result points highlighted instead of the live
-     * scanning display.
-     *
-     * @param barcode An image of the decoded barcode.
-     */
-    public void drawResultBitmap(Bitmap barcode) {
-        resultBitmap = barcode;
         invalidate();
     }
 

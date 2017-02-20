@@ -19,7 +19,7 @@ import com.google.zxing.RGBLuminanceSource;
 import com.google.zxing.Result;
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.QRCodeReader;
-import com.onehash.utils.FileUtil;
+import com.onehash.utils.FileUtils;
 import com.onehash.utils.LogHelper;
 import com.onehash.utils.ToastHelper;
 
@@ -110,7 +110,7 @@ public class ImageDecodeHelper {
     public void onSystemPhotoAlbumActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK && requestCode == REQ_IMAGE) {
             //获取选中图片的路径
-            mChoosedImagePath = FileUtil.getUriPath(mActivity.getApplicationContext(), data.getData());
+            mChoosedImagePath = FileUtils.getUriPath(mActivity.getApplicationContext(), data.getData());
             if (mOnDecodedListener != null) {
                 mOnDecodedListener.onDecoding();
             }
@@ -139,6 +139,7 @@ public class ImageDecodeHelper {
      * @param path
      * @return
      */
+    @Deprecated
     public Result scanningImage(String path) {
         if (TextUtils.isEmpty(path)) {
             return null;

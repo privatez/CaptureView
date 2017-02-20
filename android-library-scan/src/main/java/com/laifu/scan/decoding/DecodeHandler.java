@@ -31,7 +31,9 @@ import com.google.zxing.common.HybridBinarizer;
 import com.laifu.scan.R;
 import com.laifu.scan.camera.CameraManager;
 import com.laifu.scan.camera.PlanarYUVLuminanceSource;
+import com.laifu.scan.utils.Constant;
 import com.laifu.scan.utils.CustomUtil;
+import com.onehash.utils.LogHelper;
 
 import java.util.Hashtable;
 
@@ -42,6 +44,8 @@ final class DecodeHandler extends Handler {
     private Handler mHandler;
     private final MultiFormatReader multiFormatReader;
 
+    private int mDecodeMode = Constant.DECODE_QECODE;
+
     DecodeHandler(Handler handler, Hashtable<DecodeHintType, Object> hints) {
         multiFormatReader = new MultiFormatReader();
         multiFormatReader.setHints(hints);
@@ -50,12 +54,12 @@ final class DecodeHandler extends Handler {
 
     @Override
     public void handleMessage(Message message) {
-        if (message.what == R.id.decode) {//Log.d(TAG, "Got decode message");
+        if (message.what == Constant.DECODE_QECODE) {//Log.d(TAG, "Got decode message");
             decode((byte[]) message.obj, message.arg1, message.arg2);
-
+        } else if (message.what == Constant.DECODE_OCR) {
+            startOcr((byte[]) message.obj, message.arg1, message.arg2);
         } else if (message.what == R.id.quit) {
             Looper.myLooper().quit();
-
         }
     }
 
@@ -102,6 +106,35 @@ final class DecodeHandler extends Handler {
             Message message = Message.obtain(mHandler, R.id.decode_failed);
             message.sendToTarget();
         }
+    }
+
+    private void startOcr(byte[] data, int width, int height) {
+        LogHelper.log("ocr", "startOcr...");
+
+        byte[] rotatedData = CustomUtil.rotateImage(data, width, height);
+
+        int tmp = width; // Here we are swapping, that's the difference to #11
+        width = height;
+        height = tmp;
+
+        PlanarYUVLuminanceSource source = CameraManager.get().buildTailorLuminanceSource(rotatedData, width, height);
+
+        /*OcrHelper ocrUtil = new OcrHelper(new TessTwoAdapter(), new OcrResultCallback() {
+            @Override
+            public void onOcrSuccess(String text) {
+                LogHelper.log("ocr", "onOcrSuccess:" + text);
+            }
+
+            @Override
+            public void onOcrFailed() {
+                LogHelper.log("ocr", "onOcrFailed: onOcrFailed!");
+            }
+        });
+        ocrUtil.startTransaction(source.renderRotateCroppedGreyscaleBitmap());*/
+    }
+
+    void setDecodeMode(int decodeMode) {
+        mDecodeMode = decodeMode;
     }
 
 }

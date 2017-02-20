@@ -18,7 +18,7 @@ public class FlashlightManager {
         handlerFlashlight(camera, false);
     }
 
-    private static void handlerFlashlight(Camera camera, boolean enable) {
+    public static void handlerFlashlight(Camera camera, boolean enable) {
         Camera.Parameters parameters = camera.getParameters();
         if (enable) {
             parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);

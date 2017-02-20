@@ -11,7 +11,7 @@
         android:layout_height="match_parent"
         android:visibility="visible">
 
-        <com.laifu.scan.view.ScanCodeView
+        <com.laifu.scan.view.CaptureView
             android:id="@+id/s_test"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
@@ -25,27 +25,29 @@
         android:scaleType="fitXY"
         android:visibility="invisible"/>
 
-    <ImageView
-        android:id="@+id/iv_test"
-        android:layout_width="520px"
-        android:layout_height="520px"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:scaleType="fitXY"/>
-
     <Button
         android:id="@+id/btn_1"
         android:layout_width="100dp"
         android:layout_height="50dp"
+        android:visibility="gone"
         android:layout_alignParentBottom="true"
         android:text="code"/>
 
     <Button
         android:id="@+id/btn_2"
+        android:visibility="gone"
         android:layout_width="100dp"
         android:layout_height="50dp"
         android:layout_alignParentBottom="true"
         android:layout_toRightOf="@+id/btn_1"
         android:text="ocr"/>
+
+    <ImageView
+        android:id="@+id/iv_test"
+        android:layout_width="520px"
+        android:layout_height="520px"
+        android:scaleType="fitXY"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"/>
 
 </RelativeLayout>

@@ -3,7 +3,6 @@ package com.laifu.scan.utils;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 
-import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
@@ -19,7 +18,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -32,59 +30,6 @@ public class QrCodeUtil {
     private final static QRCodeWriter QR_CODE_WRITER = new QRCodeWriter();
 
     private static final Integer QR_DEFAULT_COLOR = Color.BLACK;
-
-    /**
-     * 生成二维码
-     *
-     * @param content
-     * @param size
-     * @return
-     */
-    public static Bitmap creatQrCode(final String content, final int size) {
-        return creatBitmap(content, size, BarcodeFormat.QR_CODE);
-    }
-
-    /**
-     * 生成条形码
-     *
-     * @param content
-     * @param size
-     * @return
-     */
-    public static Bitmap creatBarCode(final String content, final int size) {
-        return creatBitmap(content, size, BarcodeFormat.CODE_39);
-    }
-
-    private static Bitmap creatBitmap(final String content, final int size, BarcodeFormat format) {
-        try {
-            final Hashtable<EncodeHintType, Object> hints = new Hashtable<EncodeHintType, Object>();
-            hints.put(EncodeHintType.MARGIN, 0);
-            hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
-            hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
-            final BitMatrix result = QR_CODE_WRITER.encode(content, format, size, size, hints);
-
-            final int width = result.getWidth();
-            final int height = result.getHeight();
-            final int[] pixels = new int[width * height];
-
-            for (int y = 0; y < height; y++) {
-                final int offset = y * width;
-                for (int x = 0; x < width; x++) {
-                    if (x > 0 && x < 170 && y > 0 && y < 170) {
-                        pixels[y * width + x] = result.get(x, y) ? Color.RED : 16777215;
-                    } else {
-                        pixels[offset + x] = result.get(x, y) ? Color.BLACK : Color.TRANSPARENT;
-                    }
-                }
-            }
-
-            final Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
-            return bitmap;
-        } catch (final WriterException x) {
-            return null;
-        }
-    }
 
     /**
      * 生成右下角定位带颜色
@@ -127,12 +72,20 @@ public class QrCodeUtil {
                                       Integer bottomRightColor,
                                       boolean all) {
 
-        int startModel = 2;
-        int endModel = 5;
+        // 每个定位点中心距离定位最外层 2 个模块
+        final int posCenterOffset = 2;
+
+        int bigPosStartModel = 2;
+        int bigPosEndModel = 5;
+
+        int smallPosStartModelMarginRight = 7;
+        int smallPosEndModelMarginRight = 6;
 
         if (all) {
-            startModel = 0;
-            endModel = 7;
+            bigPosStartModel -= posCenterOffset;
+            bigPosEndModel += posCenterOffset;
+            smallPosStartModelMarginRight += posCenterOffset;
+            smallPosEndModelMarginRight -= posCenterOffset;
         }
 
         if (margin < 0) {
@@ -146,10 +99,10 @@ public class QrCodeUtil {
         bottomRightColor = checkColorNull(bottomRightColor);
 
         Map<EncodeHintType, Object> hints = getEncodeSetting(margin);
-
+        ErrorCorrectionLevel level = (ErrorCorrectionLevel) hints.get(EncodeHintType.ERROR_CORRECTION);
         QRCode code;
         try {
-            code = Encoder.encode(content, (ErrorCorrectionLevel) hints.get(EncodeHintType.ERROR_CORRECTION), hints);
+            code = Encoder.encode(content, level, hints);
         } catch (WriterException e) {
             e.printStackTrace();
             return null;
@@ -166,17 +119,17 @@ public class QrCodeUtil {
         final int modelWidth = resultWidth / totalModelNum;   //得到每个模块长度
 
         //得到四个基准点的起始与终点
-        final int topEndX = tl[0] + modelWidth * endModel;
-        final int topStartX = tl[0] + modelWidth * startModel;
-        final int topStartY = tl[0] + modelWidth * startModel;
-        final int topEndY = tl[0] + modelWidth * endModel;
-        final int rightStartX = (totalModelNum - endModel) * modelWidth + tl[0];
-        final int rightEndX = size - modelWidth * startModel - tl[0];
-        final int leftStartY = size - modelWidth * endModel - tl[1];
-        final int leftEndY = size - modelWidth * startModel - tl[1];
+        final int topStartX = tl[0] + modelWidth * bigPosStartModel;
+        final int topEndX = tl[0] + modelWidth * bigPosEndModel;
+        final int topStartY = tl[0] + modelWidth * bigPosStartModel;
+        final int topEndY = tl[0] + modelWidth * bigPosEndModel;
+        final int rightStartX = (totalModelNum - bigPosEndModel) * modelWidth + tl[0];
+        final int rightEndX = size - modelWidth * bigPosStartModel - tl[0];
+        final int leftStartY = size - modelWidth * bigPosEndModel - tl[1];
+        final int leftEndY = size - modelWidth * bigPosStartModel - tl[1];
 
-        final int rightBottomStartX = (totalModelNum - 9) * modelWidth + tl[0];
-        final int rightBottomEndX = (totalModelNum - 4) * modelWidth + tl[0];
+        final int smallPosStartX = (totalModelNum - smallPosStartModelMarginRight) * modelWidth + tl[0];
+        final int smallPosEndX = (totalModelNum - smallPosEndModelMarginRight) * modelWidth + tl[0];
 
         int[] pixels = new int[size * size];
 
@@ -184,16 +137,16 @@ public class QrCodeUtil {
 
         for (int y = 0; y < matrix.getHeight(); y++) {
             for (int x = 0; x < matrix.getWidth(); x++) {
-                if (x >= topStartX && x < topEndX && y >= topStartY && y < topEndY) {
+                if (checkInArea(x, y, topStartX, topEndX, topStartY, topEndY)) {
                     //左上角
                     pixelColor = topLeftColor;
-                } else if (x < rightEndX && x >= rightStartX && y >= topStartY && y < topEndY) {
+                } else if (checkInArea(x, y, rightStartX, rightEndX, topStartY, topEndY)) {
                     //右上角
                     pixelColor = topRightColor;
-                } else if (x >= topStartX && x < topEndX && y >= leftStartY && y < leftEndY) {
+                } else if (checkInArea(x, y, topStartX, topEndX, leftStartY, leftEndY)) {
                     //左下角
                     pixelColor = bottomLeftColor;
-                } else if (checkInArea(x, y, rightBottomStartX, rightBottomEndX, rightBottomStartX, rightBottomEndX)) {
+                } else if (checkInArea(x, y, smallPosStartX, smallPosEndX, smallPosStartX, smallPosEndX)) {
                     //右下角
                     pixelColor = bottomRightColor;
                 } else {

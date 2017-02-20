@@ -14,15 +14,15 @@ import com.laifu.scan.camera.CameraManager;
 import com.laifu.scan.utils.Constant;
 import com.laifu.scan.utils.ImageDecodeHelper;
 import com.laifu.scan.view.DisplayQrCodeView;
-import com.laifu.scan.view.ScanCodeView;
+import com.laifu.scan.view.CaptureView;
 import com.onehash.utils.LogHelper;
 import com.onehash.utils.ToastHelper;
 
-public class MainActivity extends Activity implements ScanCodeView.DecodeListener, View.OnClickListener {
+public class MainActivity extends Activity implements CaptureView.DecodeListener, View.OnClickListener {
 
 
     private RelativeLayout activityMain;
-    private ScanCodeView sTest;
+    private CaptureView sTest;
     private DisplayQrCodeView qrTest;
     private ImageView ivTest;
 
@@ -34,7 +34,7 @@ public class MainActivity extends Activity implements ScanCodeView.DecodeListene
         setContentView(R.layout.activity_main);
 
         activityMain = (RelativeLayout) findViewById(R.id.activity_main);
-        sTest = (ScanCodeView) findViewById(R.id.s_test);
+        sTest = (CaptureView) findViewById(R.id.s_test);
         qrTest = (DisplayQrCodeView) findViewById(R.id.qr_test);
         ivTest = (ImageView) findViewById(R.id.iv_test);
 
@@ -78,6 +78,10 @@ public class MainActivity extends Activity implements ScanCodeView.DecodeListene
                 mImageDecodeHandler.openSystemPhotoAlbum();
             }
         });
+
+        sTest.addFalshlightView();
+        sTest.addSystemAlbumView();
+        sTest.addOCRView();
     }
 
     @Override

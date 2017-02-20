@@ -16,7 +16,7 @@ import java.text.DecimalFormat;
  * Created by private on 2017/2/9.
  */
 
-public class FileUtil {
+public class FileUtils {
     private static final String TAG = "FileUtils";
     private static final boolean DEBUG = false;
 

@@ -1,15 +1,10 @@
 package com.laifu.scan.utils;
 
-import com.onehash.utils.ToastHelper;
-
 /**
  * Created by private on 2017/2/8.
  */
 
 public class CustomUtil {
-    public static void showErrorHint(String hint) {
-        ToastHelper.showLong(hint);
-    }
 
     public static byte[] rotateImage(byte[] data, int width, int height) {
         byte[] rotatedData = new byte[data.length];

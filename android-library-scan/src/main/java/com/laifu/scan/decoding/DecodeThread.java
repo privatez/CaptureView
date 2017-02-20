@@ -34,51 +34,55 @@ import java.util.concurrent.CountDownLatch;
 public final class DecodeThread extends Thread {
 
     public static final String BARCODE_BITMAP = "barcode_bitmap";
-    private final Hashtable<DecodeHintType, Object> hints;
-    private Handler decodeHandler;
-    private Handler captureHandler;
-    private final CountDownLatch handlerInitLatch;
+
+    private Handler mDecodeHandler;
+    private Handler mCaptureHandler;
+    private final CountDownLatch mHandlerInitLatch;
+    private final Hashtable<DecodeHintType, Object> mHints;
+
+    public DecodeThread(Handler handler, ResultPointCallback resultPointCallback) {
+        this(handler, null, null, resultPointCallback);
+    }
 
     public DecodeThread(Handler handler,
                         Vector<BarcodeFormat> decodeFormats,
                         String characterSet,
                         ResultPointCallback resultPointCallback) {
 
-        captureHandler = handler;
-        handlerInitLatch = new CountDownLatch(1);
+        mCaptureHandler = handler;
+        mHandlerInitLatch = new CountDownLatch(1);
 
-        hints = new Hashtable<DecodeHintType, Object>(3);
+        mHints = new Hashtable<>(3);
 
         if (decodeFormats == null || decodeFormats.isEmpty()) {
-            decodeFormats = new Vector<BarcodeFormat>();
+            decodeFormats = new Vector<>();
             decodeFormats.addAll(DecodeFormatManager.ONE_D_FORMATS);
             decodeFormats.addAll(DecodeFormatManager.QR_CODE_FORMATS);
             decodeFormats.addAll(DecodeFormatManager.DATA_MATRIX_FORMATS);
         }
 
-        hints.put(DecodeHintType.POSSIBLE_FORMATS, decodeFormats);
+        mHints.put(DecodeHintType.POSSIBLE_FORMATS, decodeFormats);
 
         if (characterSet != null) {
-            hints.put(DecodeHintType.CHARACTER_SET, characterSet);
+            mHints.put(DecodeHintType.CHARACTER_SET, characterSet);
         }
 
-        hints.put(DecodeHintType.NEED_RESULT_POINT_CALLBACK, resultPointCallback);
+        mHints.put(DecodeHintType.NEED_RESULT_POINT_CALLBACK, resultPointCallback);
     }
 
     public Handler getDecodeHandler() {
         try {
-            handlerInitLatch.await();
+            mHandlerInitLatch.await();
         } catch (InterruptedException ie) {
-            // continue?
         }
-        return decodeHandler;
+        return mDecodeHandler;
     }
 
     @Override
     public void run() {
         Looper.prepare();
-        decodeHandler = new DecodeHandler(captureHandler, hints);
-        handlerInitLatch.countDown();
+        mDecodeHandler = new DecodeHandler(mCaptureHandler, mHints);
+        mHandlerInitLatch.countDown();
         Looper.loop();
     }
 

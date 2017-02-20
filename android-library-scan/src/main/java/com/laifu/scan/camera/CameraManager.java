@@ -291,7 +291,9 @@ public final class CameraManager {
     public void setDecodeMode(int decodeMode) {
         mFramingRectModifyed = mDecodeMode != decodeMode;
         mDecodeMode = decodeMode;
-        previewCallback.setDecodeMode(decodeMode);
     }
 
+    public Camera getCamera() {
+        return camera;
+    }
 }
