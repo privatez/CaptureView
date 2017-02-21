@@ -79,9 +79,9 @@ public class MainActivity extends Activity implements CaptureView.DecodeListener
             }
         });
 
+        sTest.addOCRView();
         sTest.addFalshlightView();
         sTest.addSystemAlbumView();
-        sTest.addOCRView();
     }
 
     @Override

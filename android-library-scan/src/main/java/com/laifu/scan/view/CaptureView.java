@@ -77,6 +77,23 @@ public class CaptureView extends RelativeLayout implements SurfaceHolder.Callbac
         CameraManager.init(context.getApplicationContext());
 
         mEventViewSize = llBottomEvents.getLayoutParams().height;
+
+        addBackView();
+    }
+
+    private void addBackView() {
+        CaptureEventViewParameter parameter = new CaptureEventViewParameter(
+                CaptureViewConstant.BACK_CHECKED, CaptureViewConstant.BACK_UNCHECKED,
+                CaptureViewConstant.BACK_PRESSED, new OnCaptureEventViewCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    doBack(mContext);
+                }
+            }
+        });
+        CaptureEventView eventView = new CaptureEventView(mContext, parameter);
+        addView(eventView);
     }
 
     public void addFalshlightView() {
@@ -178,7 +195,6 @@ public class CaptureView extends RelativeLayout implements SurfaceHolder.Callbac
             e.printStackTrace();
         }
     }
-
 
     public void drawViewfinder() {
         viewfinderView.drawViewfinder();
