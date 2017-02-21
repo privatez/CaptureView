@@ -16,6 +16,7 @@
 
 package com.laifu.scan.decoding;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -31,6 +32,10 @@ import com.google.zxing.common.HybridBinarizer;
 import com.laifu.scan.R;
 import com.laifu.scan.camera.CameraManager;
 import com.laifu.scan.camera.PlanarYUVLuminanceSource;
+import com.laifu.scan.ocr.OcrHelper;
+import com.laifu.scan.ocr.OcrResultCallback;
+import com.laifu.scan.ocr.TessTwoAdapter;
+import com.laifu.scan.ocr.model.OcrResult;
 import com.laifu.scan.utils.Constant;
 import com.laifu.scan.utils.CustomUtil;
 import com.onehash.utils.LogHelper;
@@ -55,8 +60,10 @@ final class DecodeHandler extends Handler {
     @Override
     public void handleMessage(Message message) {
         if (message.what == Constant.DECODE_QECODE) {//Log.d(TAG, "Got decode message");
+            mDecodeMode = Constant.DECODE_QECODE;
             decode((byte[]) message.obj, message.arg1, message.arg2);
         } else if (message.what == Constant.DECODE_OCR) {
+            mDecodeMode = Constant.DECODE_OCR;
             startOcr((byte[]) message.obj, message.arg1, message.arg2);
         } else if (message.what == R.id.quit) {
             Looper.myLooper().quit();
@@ -96,9 +103,10 @@ final class DecodeHandler extends Handler {
         if (rawResult != null) {
             long end = System.currentTimeMillis();
             Log.d(TAG, "Found barcode (" + (end - start) + " ms):\n" + rawResult.toString());
-            Message message = Message.obtain(mHandler, R.id.decode_succeeded, rawResult);
+            Message message = Message.obtain(mHandler, R.id.decode_succeeded, rawResult.getText());
             Bundle bundle = new Bundle();
-            bundle.putParcelable(DecodeThread.BARCODE_BITMAP, source.renderCroppedGreyscaleBitmap());
+            bundle.putInt(DecodeThread.DECODE_MODE, mDecodeMode);
+            bundle.putParcelable(DecodeThread.CAPTURE_BITMAP, source.renderCroppedGreyscaleBitmap());
             message.setData(bundle);
             //Log.d(TAG, "Sending decode succeeded message...");
             message.sendToTarget();
@@ -119,22 +127,26 @@ final class DecodeHandler extends Handler {
 
         PlanarYUVLuminanceSource source = CameraManager.get().buildTailorLuminanceSource(rotatedData, width, height);
 
-        /*OcrHelper ocrUtil = new OcrHelper(new TessTwoAdapter(), new OcrResultCallback() {
+        final Bitmap bitmap = source.renderRotateCroppedGreyscaleBitmap();
+
+        OcrHelper ocrUtil = new OcrHelper(new TessTwoAdapter(), new OcrResultCallback() {
             @Override
-            public void onOcrSuccess(String text) {
-                LogHelper.log("ocr", "onOcrSuccess:" + text);
+            public void onOcrSuccess(OcrResult result) {
+                Message message = Message.obtain(mHandler, R.id.decode_succeeded, result.mOcrText);
+                Bundle bundle = new Bundle();
+                bundle.putInt(DecodeThread.DECODE_MODE, mDecodeMode);
+                bundle.putParcelable(DecodeThread.CAPTURE_BITMAP, bitmap);
+                message.setData(bundle);
+                message.sendToTarget();
             }
 
             @Override
             public void onOcrFailed() {
-                LogHelper.log("ocr", "onOcrFailed: onOcrFailed!");
+                Message message = Message.obtain(mHandler, R.id.decode_failed);
+                message.sendToTarget();
             }
         });
-        ocrUtil.startTransaction(source.renderRotateCroppedGreyscaleBitmap());*/
-    }
-
-    void setDecodeMode(int decodeMode) {
-        mDecodeMode = decodeMode;
+        ocrUtil.getOcrText(bitmap);
     }
 
 }

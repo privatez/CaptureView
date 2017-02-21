@@ -3,6 +3,7 @@ package com.laifu.scan.view;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.os.Message;
 import android.util.AttributeSet;
@@ -15,7 +16,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
-import com.google.zxing.Result;
 import com.laifu.scan.R;
 import com.laifu.scan.camera.CameraManager;
 import com.laifu.scan.decoding.DecodeThread;
@@ -286,11 +286,11 @@ public class CaptureView extends RelativeLayout implements SurfaceHolder.Callbac
         CameraManager.get().requestAutoFocus(mCaptureHandler, R.id.auto_focus);
     }
 
-    public void handleDecode(Result result, Bitmap barcode) {
+    public void handleDecode(int decodeMode, String result, Bitmap barcode) {
         mTimer.onActivity();
         mPlayer.playBeepSoundAndVibrate();
         if (mDecodeListener != null) {
-            mDecodeListener.handleDecode(result, barcode);
+            mDecodeListener.handleDecode(decodeMode, result, barcode);
         }
     }
 
@@ -304,7 +304,7 @@ public class CaptureView extends RelativeLayout implements SurfaceHolder.Callbac
     }
 
     public interface DecodeListener {
-        void handleDecode(Result result, Bitmap barcode);
+        void handleDecode(int decodeMode, String result, Bitmap barcode);
     }
 
     public interface OnResumeCaptureViewListener {

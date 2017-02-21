@@ -5,9 +5,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
-import com.google.zxing.Result;
 import com.laifu.scan.R;
 import com.laifu.scan.decoding.DecodeThread;
+import com.laifu.scan.utils.Constant;
 
 /**
  * Created by private on 2017/2/20.
@@ -38,8 +38,13 @@ class CaptureHandler extends Handler {
         } else if (id == R.id.decode_succeeded) {
             state = STATE_DONE;
             Bundle bundle = message.getData();
-            Bitmap barcode = bundle == null ? null : (Bitmap) bundle.getParcelable(DecodeThread.BARCODE_BITMAP);
-            view.handleDecode((Result) message.obj, barcode);
+            Bitmap bitmap = null;
+            int decodeMode = Constant.DECODE_QECODE;
+            if (bundle != null) {
+                bitmap = bundle.getParcelable(DecodeThread.CAPTURE_BITMAP);
+                decodeMode = bundle.getInt(DecodeThread.DECODE_MODE);
+            }
+            view.handleDecode(decodeMode, message.obj.toString(), bitmap);
         } else if (id == R.id.decode_failed) {
             state = STATE_PREVIEW;
             view.requestPreviewFrame();

@@ -9,12 +9,11 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
-import com.google.zxing.Result;
 import com.laifu.scan.camera.CameraManager;
 import com.laifu.scan.utils.Constant;
 import com.laifu.scan.utils.ImageDecodeHelper;
-import com.laifu.scan.view.DisplayQrCodeView;
 import com.laifu.scan.view.CaptureView;
+import com.laifu.scan.view.DisplayQrCodeView;
 import com.onehash.utils.LogHelper;
 import com.onehash.utils.ToastHelper;
 
@@ -124,9 +123,12 @@ public class MainActivity extends Activity implements CaptureView.DecodeListener
     }
 
     @Override
-    public void handleDecode(Result result, Bitmap barcode) {
-        LogHelper.log(result.getText());
+    public void handleDecode(int decodeMode, String result, Bitmap barcode) {
         sTest.restartCamera();
-        ivTest.setImageBitmap(barcode);
+        if (Constant.DECODE_QECODE == decodeMode) {
+            //ivTest.setImageBitmap(barcode);
+        } else {
+        }
+            ToastHelper.showLong(result);
     }
 }

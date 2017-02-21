@@ -15,6 +15,7 @@ import java.util.UUID;
  * Created by private on 2017/2/14.
  */
 
+@Deprecated
 public class OcrTransactionManager implements OcrResultCallback {
 
     private static final int MIN_OCRING_MAX_TOTAL = 1;
