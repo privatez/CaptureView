@@ -38,6 +38,17 @@ public class OcrAsyncTask extends AsyncTask<Object, Integer, String> {
         } else if (OcrImgParameter.OCR_FILE == ocrMode) {
             mTessBaseAPI.setImage(new File(mOcrImgParam.mImgPath));
         } else if (OcrImgParameter.OCR_BITMAP == ocrMode) {
+            /*Bitmap bitmap = mOcrImgParam.mImgBmp;
+            int pix = bitmap.getByteCount() / (bitmap.getWidth() * bitmap.getHeight());
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+            byte[] data = baos.toByteArray();
+            try {
+                baos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            mTessBaseAPI.setImage(data, bitmap.getWidth(), bitmap.getHeight(), pix, bitmap.getRowBytes());*/
             mTessBaseAPI.setImage(mOcrImgParam.mImgBmp);
         }
         return mTessBaseAPI.getUTF8Text();

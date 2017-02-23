@@ -144,6 +144,7 @@ final class DecodeHandler extends Handler {
             public void onOcrFailed() {
                 Message message = Message.obtain(mHandler, R.id.decode_failed);
                 message.sendToTarget();
+                LogHelper.log("OcrHelper onOcrFailed");
             }
         });
         ocrUtil.getOcrText(bitmap);
