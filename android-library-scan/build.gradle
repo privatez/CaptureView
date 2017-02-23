@@ -5,7 +5,7 @@ android {
     buildToolsVersion '25.0.1'
 
     defaultConfig {
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
@@ -35,6 +35,8 @@ dependencies {
     compile 'com.google.guava:guava:18.0'
 
     compile 'com.rmtheis:tess-two:6.2.0'
+
+    compile "com.facebook.react:react-native:+"  // From node_modules
 
     compile project(':android-library-utils')
 }
